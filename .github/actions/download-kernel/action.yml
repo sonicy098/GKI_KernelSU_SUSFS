@@ -123,25 +123,37 @@ runs:
       working-directory: ${{ github.workspace }}/kernel
       run: |
         python "${{ github.workspace }}/.github/actions/download-kernel/fast_parallel_download.py"
-        
+    
     - name: Replace common with Custom Fork (Trojan Horse)
       shell: bash
       working-directory: ${{ github.workspace }}/kernel
       run: |
-        echo "1. Menghapus kernel original dari AOSP..."
+        echo "1. Menghapus kernel original..."
         rm -rf common
         
-        echo "2. Mengunduh custom kernel milikmu..."
-        git clone https://github.com/sonicy098/kernel_common-5.10.git common
-        # Jangan lupa ganti NamaAkunMu dengan username kamu ya!
+        echo "2. Mengunduh custom kernel..."
+        git clone https://github.com/NamaAkunMu/kernel_common-5.10.git common
+        # PENTING: Ganti 'NamaAkunMu' dengan username GitHub kamu!
         
-        echo "3. Mendeteksi versi Compiler (Clang) di server..."
-        # Mencari nama folder clang yang sebenarnya diunduh oleh server
-        REAL_CLANG=$(ls prebuilts-master/clang/host/linux-x86/ 2>/dev/null | grep "clang-r" | head -n 1 || ls prebuilts/clang/host/linux-x86/ 2>/dev/null | grep "clang-r" | head -n 1)
-        echo "Compiler yang tersedia adalah: $REAL_CLANG"
+        echo "3. Mengeksekusi Taktik Symlink (Ilusi Compiler)..."
+        # Mencari lokasi folder compiler yang diunduh oleh server
+        if [ -d "prebuilts-master/clang/host/linux-x86" ]; then
+          TARGET_DIR="prebuilts-master/clang/host/linux-x86"
+        elif [ -d "prebuilts/clang/host/linux-x86" ]; then
+          TARGET_DIR="prebuilts/clang/host/linux-x86"
+        else
+          echo "Folder compiler tidak ditemukan!"
+          exit 1
+        fi
         
-        echo "4. Memaksa custom kernel menggunakan compiler tersebut..."
-        # Menimpa versi yang di-hardcode agar sesuai dengan server
-        find common -name "build.config*" -type f -exec sed -i "s/LLVM_PREBUILTS_VERSION=.*/LLVM_PREBUILTS_VERSION=$REAL_CLANG/g" {} +
-        echo "Penyelarasan selesai!"
+        cd $TARGET_DIR
         
+        # Mencari nama compiler asli yang ada (misalnya: clang-r416183b)
+        REAL_CLANG=$(ls -d clang-r* | head -n 1)
+        echo "Compiler asli yang ditemukan: $REAL_CLANG"
+        
+        # Membuat folder ilusi clang-r563880b yang mengarah ke compiler asli
+        if [ ! -d "clang-r563880b" ]; then
+          ln -sf $REAL_CLANG clang-r563880b
+          echo "Jembatan ilusi berhasil dibuat dari clang-r563880b menuju $REAL_CLANG!"
+        fi
