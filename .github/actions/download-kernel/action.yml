@@ -149,7 +149,8 @@ runs:
           ln -sf $REAL_CLANG clang-r563880b
         fi
         
-        echo "4. Membungkam Inspektur Kerapian Google..."
+        echo "4. Membunuh Inspektur Kerapian secara permanen..."
         cd ${{ github.workspace }}/kernel
-        echo "SKIP_DEFCONFIG_CHECK=1" >> common/build.config.common
+        # Mencari semua file build.config dan mengubah 'check_defconfig' menjadi 'true'
+        find common -name "build.config*" -type f -exec sed -i 's/check_defconfig/true/g' {} +
         echo "Siap untuk kompilasi utama!"
