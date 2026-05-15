@@ -128,9 +128,20 @@ runs:
       shell: bash
       working-directory: ${{ github.workspace }}/kernel
       run: |
-        echo "Menghapus kernel original dari AOSP..."
+        echo "1. Menghapus kernel original dari AOSP..."
         rm -rf common
-        echo "Mengunduh custom kernel milikmu..."
+        
+        echo "2. Mengunduh custom kernel milikmu..."
         git clone https://github.com/sonicy098/kernel_common-5.10.git common
-        # Catatan: Ganti 'NamaAkunMu' dengan username GitHub kamu yang sebenarnya!
+        # Jangan lupa ganti NamaAkunMu dengan username kamu ya!
+        
+        echo "3. Mendeteksi versi Compiler (Clang) di server..."
+        # Mencari nama folder clang yang sebenarnya diunduh oleh server
+        REAL_CLANG=$(ls prebuilts-master/clang/host/linux-x86/ 2>/dev/null | grep "clang-r" | head -n 1 || ls prebuilts/clang/host/linux-x86/ 2>/dev/null | grep "clang-r" | head -n 1)
+        echo "Compiler yang tersedia adalah: $REAL_CLANG"
+        
+        echo "4. Memaksa custom kernel menggunakan compiler tersebut..."
+        # Menimpa versi yang di-hardcode agar sesuai dengan server
+        find common -name "build.config*" -type f -exec sed -i "s/LLVM_PREBUILTS_VERSION=.*/LLVM_PREBUILTS_VERSION=$REAL_CLANG/g" {} +
+        echo "Penyelarasan selesai!"
         
