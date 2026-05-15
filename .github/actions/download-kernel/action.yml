@@ -133,24 +133,26 @@ runs:
         
         echo "2. Mengunduh custom kernel..."
         git clone https://github.com/sonicy098/kernel_common-5.10.git common
+        # Jangan lupa ganti NamaAkunMu!
         
-        echo "3. Mengeksekusi Taktik Symlink (Ilusi Compiler)..."
+        echo "3. Mengunduh Compiler Asli (Bukan Ilusi)..."
+        # Mengambil langsung clang-r563880b dari server pusat Google
+        mkdir -p /tmp/clang-dl
+        cd /tmp/clang-dl
+        git init
+        git remote add origin https://android.googlesource.com/platform/prebuilts/clang/host/linux-x86
+        git config core.sparseCheckout true
+        echo "clang-r563880b/" >> .git/info/sparse-checkout
+        git pull --depth=1 origin main
+        
+        # Pindahkan compiler asli ke dalam Pabrik
+        cd ${{ github.workspace }}/kernel
         if [ -d "prebuilts-master/clang/host/linux-x86" ]; then
-          TARGET_DIR="prebuilts-master/clang/host/linux-x86"
+          cp -r /tmp/clang-dl/clang-r563880b prebuilts-master/clang/host/linux-x86/
         elif [ -d "prebuilts/clang/host/linux-x86" ]; then
-          TARGET_DIR="prebuilts/clang/host/linux-x86"
-        else
-          echo "Folder compiler tidak ditemukan!"
-          exit 1
-        fi
-        cd $TARGET_DIR
-        REAL_CLANG=$(ls -d clang-r* | head -n 1)
-        if [ ! -d "clang-r563880b" ]; then
-          ln -sf $REAL_CLANG clang-r563880b
+          cp -r /tmp/clang-dl/clang-r563880b prebuilts/clang/host/linux-x86/
         fi
         
         echo "4. Membunuh Inspektur Kerapian secara permanen..."
-        cd ${{ github.workspace }}/kernel
-        # Mencari semua file build.config dan mengubah 'check_defconfig' menjadi 'true'
         find common -name "build.config*" -type f -exec sed -i 's/check_defconfig/true/g' {} +
         echo "Siap untuk kompilasi utama!"
