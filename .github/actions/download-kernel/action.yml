@@ -131,6 +131,6 @@ runs:
         echo "Menghapus kernel original dari AOSP..."
         rm -rf common
         echo "Mengunduh custom kernel milikmu..."
-        git clone https://github.com/NamaAkunMu/kernel_common-5.10.git common
+        git clone https://github.com/sonicy098/kernel_common-5.10.git common
         # Catatan: Ganti 'NamaAkunMu' dengan username GitHub kamu yang sebenarnya!
         
