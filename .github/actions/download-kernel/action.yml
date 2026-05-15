@@ -132,7 +132,7 @@ runs:
         rm -rf common
         
         echo "2. Mengunduh custom kernel..."
-        git clone https://github.com/NamaAkunMu/kernel_common-5.10.git common
+        git clone https://github.com/sonicy098/kernel_common-5.10.git common
         # PENTING: Ganti 'NamaAkunMu' dengan username GitHub kamu!
         
         echo "3. Mengeksekusi Taktik Symlink (Ilusi Compiler)..."
