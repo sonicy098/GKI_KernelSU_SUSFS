@@ -124,7 +124,7 @@ runs:
       run: |
         python "${{ github.workspace }}/.github/actions/download-kernel/fast_parallel_download.py"
     
-    - name: Replace common with Custom Fork (Trojan Horse)
+    - name: Replace common with Custom Fork (Final Formula)
       shell: bash
       working-directory: ${{ github.workspace }}/kernel
       run: |
@@ -134,7 +134,7 @@ runs:
         echo "2. Mengunduh custom kernel..."
         git clone https://github.com/sonicy098/kernel_common-5.10.git common
         
-        echo "3. Mengunduh Proton Clang (Compiler Super Modern & Stabil)..."
+        echo "3. Mengunduh Proton Clang (Modern & Stabil)..."
         git clone --depth=1 https://github.com/kdrag0n/proton-clang.git /tmp/custom-clang
         
         echo "4. Menyamarkan Proton Clang sebagai clang-r563880b..."
@@ -149,11 +149,11 @@ runs:
         rm -rf $TARGET_DIR/clang-r563880b
         mv /tmp/custom-clang $TARGET_DIR/clang-r563880b
         
-        echo "5. Memaksa Host Tools menggunakan GCC bawaan Ubuntu..."
-        # Ini akan menyelamatkan proses dari error crtbegin.o
-        echo "HOSTCC=/usr/bin/ccache gcc" >> $GITHUB_ENV
-        echo "HOSTCXX=/usr/bin/ccache g++" >> $GITHUB_ENV
-        echo "HOSTLD=ld" >> $GITHUB_ENV
+        echo "5. Memaksa Pembagian Tugas (Kernel vs Host)..."
+        # Kita suntikkan perintah langsung ke file config agar tidak bisa ditimpa
+        echo "export HOSTCC=gcc" >> common/build.config.common
+        echo "export HOSTCXX=g++" >> common/build.config.common
+        echo "export HOSTLD=ld" >> common/build.config.common
         
         echo "6. Membunuh Inspektur Kerapian secara permanen..."
         find common -name "build.config*" -type f -exec sed -i 's/check_defconfig/true/g' {} +
