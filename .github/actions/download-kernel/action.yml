@@ -133,16 +133,12 @@ runs:
         
         echo "2. Mengunduh custom kernel..."
         git clone https://github.com/sonicy098/kernel_common-5.10.git common
-        # Ingat: Ganti 'NamaAkunMu' dengan username GitHub-mu yang asli!
         
-        echo "3. Mengunduh Neutron Clang (Compiler Super Modern)..."
-        # Berhenti bergantung pada Google, kita gunakan toolchain khusus custom kernel
-        mkdir -p /tmp/neutron-clang
-        cd /tmp/neutron-clang
-        curl -LO "https://raw.githubusercontent.com/Neutron-Toolchains/antch/master/setup.sh"
-        bash setup.sh
+        echo "3. Mengunduh Proton Clang (Compiler Super Modern & Stabil)..."
+        # Menggunakan git clone langsung, bebas dari error 404
+        git clone --depth=1 https://github.com/kdrag0n/proton-clang.git /tmp/custom-clang
         
-        echo "4. Menyamarkan Neutron Clang sebagai clang-r563880b..."
+        echo "4. Menyamarkan Proton Clang sebagai clang-r563880b..."
         cd ${{ github.workspace }}/kernel
         if [ -d "prebuilts-master/clang/host/linux-x86" ]; then
           TARGET_DIR="prebuilts-master/clang/host/linux-x86"
@@ -153,9 +149,9 @@ runs:
           exit 1
         fi
         
-        # Hapus sisa folder jika ada, lalu pindahkan Neutron Clang ke posisinya
+        # Hapus sisa folder jika ada, lalu pindahkan Proton Clang ke posisinya
         rm -rf $TARGET_DIR/clang-r563880b
-        mv /tmp/neutron-clang $TARGET_DIR/clang-r563880b
+        mv /tmp/custom-clang $TARGET_DIR/clang-r563880b
         
         echo "5. Membunuh Inspektur Kerapian secara permanen..."
         find common -name "build.config*" -type f -exec sed -i 's/check_defconfig/true/g' {} +
