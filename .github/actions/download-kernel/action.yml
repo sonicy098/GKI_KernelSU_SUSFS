@@ -135,11 +135,9 @@ runs:
         git clone https://github.com/sonicy098/kernel_common-5.10.git common
         
         echo "3. Mengunduh Proton Clang (Compiler Super Modern & Stabil)..."
-        # Menggunakan git clone langsung, bebas dari error 404
         git clone --depth=1 https://github.com/kdrag0n/proton-clang.git /tmp/custom-clang
         
         echo "4. Menyamarkan Proton Clang sebagai clang-r563880b..."
-        cd ${{ github.workspace }}/kernel
         if [ -d "prebuilts-master/clang/host/linux-x86" ]; then
           TARGET_DIR="prebuilts-master/clang/host/linux-x86"
         elif [ -d "prebuilts/clang/host/linux-x86" ]; then
@@ -148,11 +146,15 @@ runs:
           echo "Folder compiler tidak ditemukan!"
           exit 1
         fi
-        
-        # Hapus sisa folder jika ada, lalu pindahkan Proton Clang ke posisinya
         rm -rf $TARGET_DIR/clang-r563880b
         mv /tmp/custom-clang $TARGET_DIR/clang-r563880b
         
-        echo "5. Membunuh Inspektur Kerapian secara permanen..."
+        echo "5. Memaksa Host Tools menggunakan GCC bawaan Ubuntu..."
+        # Ini akan menyelamatkan proses dari error crtbegin.o
+        echo "HOSTCC=/usr/bin/ccache gcc" >> $GITHUB_ENV
+        echo "HOSTCXX=/usr/bin/ccache g++" >> $GITHUB_ENV
+        echo "HOSTLD=ld" >> $GITHUB_ENV
+        
+        echo "6. Membunuh Inspektur Kerapian secara permanen..."
         find common -name "build.config*" -type f -exec sed -i 's/check_defconfig/true/g' {} +
         echo "Siap untuk kompilasi utama!"
